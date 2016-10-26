@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+
+{% block title %}Login{% endblock %}
+
+
+{% block content %}
+<h2>Register</h2>
+<form method="post" action="{% url 'register' %}">
+    {% csrf_token %}
+    <input type="hidden" name="invite" value="{{ invite }}">
+    {{ form.as_p }}
+
+    <p><textarea placeholder="TOS"></textarea></p>
+    <p>
+        <input id="agree_tos" type="checkbox">
+        <label for="agree_tos">I agree to TOS</label>
+    </p>
+    <p><button type="submit">Register</button></p>
+
+</form>
+
+{% endblock %}

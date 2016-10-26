@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Team{% endblock %}
+
+{% block content %}
+
+    <h2>Manage</h2>
+    <div class="panel panel-default">
+        <div class="panel panel-heading">
+            <strong>My Team</strong>
+        </div>
+            <div class="panel-body">
+                <table class="table">
+                    <tbody>
+                        {% for member in current_team  %}
+                        <tr>
+                            <td>{{ member.user.first_name }} {{ member.user.last_name }} <small>(@{{member.user.username}})</small></td>
+                            <td>{{ member.user.email }}</td>
+                            <td>Joined {{ member.user.date_joined }}</td>
+                            <td>
+                            {% for stat in dasstats %}
+                            {% if stat.user_id == member.user.id %}
+                                {% if stat.status == "started" %}
+                                <div>
+                                    <span class="label label-primary">{{stat.module}}</span>
+                                    {% endif %}
+                                    <small>{{stat.dtg}}</small>
+                                </div>
+                            {% endif %}
+                            {% endfor %}
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <hr>
+            </div>
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div>
+                    <form class="form-inline" method="POST" action="{% url 'manage' %}">
+                        {% csrf_token %}
+                        Invite others:
+                        <input type="email" name="email" class="form-control" placeholder="Email">
+                        {% if user.is_superuser %}
+                        <input type="checkbox" name="staff" id="is_staff">
+                        <label for="is_staff">Staff</label>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    </form>
+                </div>
+                <table class="table">
+                    {% if team_pending_invites %}
+                    <caption>Pending Invites</caption>
+                    <tbody>
+                        {% for invite in team_pending_invites %}
+                        <tr>
+                            <td>{{ invite.email }}</td>
+                            <td><code>{{ invite.invite_code }}</code></td>
+                            <td>Sent {{ invite.sent }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% else %}
+                    <caption>No pending invites</caption>
+                    {% endif %}
+                </table>
+
+            </div>
+    </div>
+
+
+    {% if user.is_superuser %}
+    <div class="panel panel-default">
+        <div class="panel panel-heading">
+            <b>Superuser</b>
+        </div>
+        <div class="panel-body">
+            Site-wide, <b>{{ total_invites|length }}</b> invites have been sent.<br>
+            We are still waiting on <b>{{ pending_invites|length  }}</b> to register.
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="panel panel-default">
+            <div class="panel panel-heading">
+                <b>Team Message Board</b>
+            </div>
+            <div class="panel-body">
+            (make a message board)
+            </div>
+    </div>
+
+
+
+
+
+{% endblock %}

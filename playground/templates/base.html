@@ -1,0 +1,55 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>
+        {% block title %}
+        Daimler Learning Platform
+        {% endblock %}
+        </title>
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+        <link rel="stylesheet" href="{% static 'css/site_custom.css' %}">
+    </head>
+    <body>
+        <div class="beta">
+            BETA
+        </div>
+        <header>
+            <h1>Daimler Learning Platform</h1>
+
+            <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+            &nbsp;
+            {% if user.is_authenticated %}
+                {% if user.is_superuser %}
+                <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
+                {% endif %}
+                {% if user.is_staff %}
+                <a href="{% url 'manage' %}">Team</a>
+                {% endif %}
+                <a href="{% url 'message' %}">Message Board</a>
+                <a href="{% url 'profile' %}">Profile</a>
+                <a href="{% url 'home' %}">Modules</a>
+                <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                <a href="{% url 'login' %}">Login</a>
+            {% endif %}
+        </header>
+        {% if messages %}
+        <div class="container">
+            <div class="alert alert-info" role="alert">
+            {% for message in messages %}
+                <b>{{ message }}</b>
+            {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+        <div class="container">
+            {% block content %}
+
+            {% endblock %}
+
+        </div>
+    </body>
+    <script src="{% static 'js/custom.js' %}"></script>
+</html>

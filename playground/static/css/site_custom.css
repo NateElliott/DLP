@@ -1,0 +1,14 @@
+.beta {
+    background: #000;
+    padding: 3px;
+    color: #FFF;
+    font-size: 0.75em;
+}
+.date-right {
+    float:right
+  }
+
+
+.message-reply {
+    padding: 3px;
+}
