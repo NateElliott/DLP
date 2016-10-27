@@ -231,7 +231,17 @@ def module(request, storage=None):
 
 
 @login_required
-def profile(request):
+def profile(request, username=None):
+
+    if username and request.user.is_staff:
+        msg = None
+        if User.objects.filter(username=username):
+            userprofile = User.objects.get(username=username)
+        else:
+            info(request, "User profile not found")
+            return redirect("/manage")
+
+        return render(request, "userprofile.html",{"profile":userprofile})
 
     if request.method == "POST":
         current_user = User.objects.get(username=request.user.username)
@@ -240,7 +250,7 @@ def profile(request):
         current_user.last_name = request.POST['lastname']
         current_user.save()
         info(request, "Profile Updated")
-        return redirect('/profile')
+        return redirect("/profile")
 
     else:
         return render(request, "profile.html")

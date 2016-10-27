@@ -14,17 +14,20 @@
                     <tbody>
                         {% for member in current_team  %}
                         <tr>
-                            <td>{{ member.user.first_name }} {{ member.user.last_name }} <small>(@{{member.user.username}})</small></td>
+                            <td><a href="/profile/{{ member.user.username }}">{{ member.user.first_name }} {{ member.user.last_name }}</a>
+
+                            </td>
                             <td>{{ member.user.email }}</td>
                             <td>Joined {{ member.user.date_joined }}</td>
                             <td>
+                                <div>
                             {% for stat in dasstats %}
                             {% if stat.user_id == member.user.id %}
                                 {% if stat.status == "started" %}
                                 <div>
                                     <span class="label label-primary">{{stat.module}}</span>
                                     {% endif %}
-                                    <small>{{stat.dtg}}</small>
+                                    <small>started {{stat.dtg}}</small>
                                 </div>
                             {% endif %}
                             {% endfor %}

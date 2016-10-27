@@ -22,6 +22,8 @@ urlpatterns = [
     url(r'message/(?P<message_id>[-\w]+)', views.message, name='message'),
     url(r'message/', views.message, name='message'),
 
+    url(r'profile/(?P<username>[-\w]+)', views.profile, name='profile'),
     url(r'profile/', views.profile, name='profile'),
+
 
 ]
