@@ -23,7 +23,7 @@
                                 <div>
                             {% for stat in dasstats %}
                             {% if stat.user_id == member.user.id %}
-                                {% if stat.status == "started" %}
+                                {% if stat.status == "0" %}
                                 <div>
                                     <span class="label label-primary">{{stat.module}}</span>
                                     {% endif %}

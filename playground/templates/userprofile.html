@@ -3,7 +3,19 @@
 {% block title %}Profile{% endblock %}
 
 {% block content %}
-    <h2>{{profile}}</h2>
+
+    <h2>{{profile.first_name}} {{profile.last_name}}</h2>
+
+    <table class="table">
+        {% for module in module_status %}
+            {% if module.status == "0" %}
+            <tr>
+                <td>{{ module.module }}</td>
+                <td><small>Started {{ module.dtg }}</small></td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
 
 
 

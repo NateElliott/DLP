@@ -220,7 +220,8 @@ def module(request, storage=None):
         if not ModulesStatus.objects.filter(user=request.user,module=current_module):
             ModulesStatus(user=request.user,
                           module=current_module,
-                          status="started").save()
+                          status="0").save()
+
 
         return render(request, "module.html", {"module": current_module})
 
@@ -234,14 +235,21 @@ def module(request, storage=None):
 def profile(request, username=None):
 
     if username and request.user.is_staff:
-        msg = None
         if User.objects.filter(username=username):
-            userprofile = User.objects.get(username=username)
+            profile = User.objects.get(username=username)
+
+            modules = ModulesStatus.objects.filter(user=profile)
+
+            # append with this list
+
+            return render(request, "userprofile.html", {"profile": profile,
+                                                        "module_status":modules,})
+
         else:
             info(request, "User profile not found")
             return redirect("/manage")
 
-        return render(request, "userprofile.html",{"profile":userprofile})
+
 
     if request.method == "POST":
         current_user = User.objects.get(username=request.user.username)
@@ -249,6 +257,7 @@ def profile(request, username=None):
         current_user.first_name = request.POST['firstname']
         current_user.last_name = request.POST['lastname']
         current_user.save()
+
         info(request, "Profile Updated")
         return redirect("/profile")
 
