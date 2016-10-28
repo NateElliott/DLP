@@ -5,13 +5,13 @@
 {% block content %}
 
     <h2>{{profile.first_name}} {{profile.last_name}}</h2>
-
+    <small>Last login was {{ profile.last_login|timesince }} ago</small>
     <table class="table">
         {% for module in module_status %}
             {% if module.status == "0" %}
             <tr>
                 <td>{{ module.module }}</td>
-                <td><small>Started {{ module.dtg }}</small></td>
+                <td><small>Started {{ module.dtg|timesince }} ago</small></td>
             </tr>
             {% endif %}
         {% endfor %}
