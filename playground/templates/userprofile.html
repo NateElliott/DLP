@@ -6,7 +6,29 @@
 
     <h2>{{profile.first_name}} {{profile.last_name}}</h2>
     <small>Last login was {{ profile.last_login|timesince }} ago</small>
-    <table class="table">
+    <div class="container">
+
+        {% for module in module_status %}
+        <div>
+            {% if module.status == "0" %}
+                Started <a href="#!">{{ module.module }}</a> on {{ module.dtg }}
+            {% endif %}
+
+
+            {% if module.status == "100" %}
+                Finished <a href="#!">{{ module.module }}</a> on {{ module.dtg }}
+            {% endif %}
+
+        </div>
+        {% endfor %}
+
+    </div>
+
+
+
+
+<!--
+<table class="table">
         {% for module in module_status %}
             {% if module.status == "0" %}
             <tr>
@@ -16,7 +38,7 @@
             {% endif %}
         {% endfor %}
     </table>
-
+-->
 
 
 {% endblock %}

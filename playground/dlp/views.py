@@ -211,21 +211,28 @@ def manage(request):
 
 
 
-
 @login_required
 def module(request, storage=None):
-
-    try:
+    status = 0
+    # TODO: this is a fucking mess
+    if Modules.objects.filter(storage=storage):
         current_module = Modules.objects.get(storage=storage)
+        if request.method == "POST" and int(request.POST["module_status"]) in range(0,101):
+            if not ModulesStatus.objects.filter(user=request.user, module=current_module,status=100):
+
+                ModulesStatus(user=request.user,
+                              module=current_module,
+                              status=request.POST["module_status"]).save()
+
         if not ModulesStatus.objects.filter(user=request.user,module=current_module):
-            ModulesStatus(user=request.user,
-                          module=current_module,
-                          status="0").save()
+            ModulesStatus(user=request.user,module=current_module,status=status).save()
 
+        status = ModulesStatus.objects.filter(user=request.user, module=current_module).order_by("-dtg")[:1][0].status
 
-        return render(request, "module.html", {"module": current_module})
+        return render(request, "module.html", {"module": current_module,
+                                               "status": status})
 
-    except:
+    else:
         info(request, "There was an error with your request")
         return redirect("/home/")
 
@@ -237,16 +244,19 @@ def profile(request, username=None):
     if username and request.user.is_staff:
         if User.objects.filter(username=username):
             profile = User.objects.get(username=username)
+            modules = Modules.objects.filter(published=True)
+            module_status = ModulesStatus.objects.filter(user=profile).order_by("dtg")
 
-            modules = ModulesStatus.objects.filter(user=profile)
+
+
 
             # append with this list
 
             return render(request, "userprofile.html", {"profile": profile,
-                                                        "module_status":modules,})
+                                                        "module_status":module_status,})
 
         else:
-            info(request, "User profile not found")
+            info(request, "There was an error with your request.")
             return redirect("/manage")
 
 

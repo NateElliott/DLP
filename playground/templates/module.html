@@ -7,8 +7,15 @@
     <h2><small>{{ module.description }}</small></h2>
     <div class="panel panel-default">
         <div class="panel-body">
+            {{ status }}
             Learning!
+            <hr>
+            <form method="post">
+                {% csrf_token %}
+                <input type="number" name="module_status" placeholder="Set module status (0-100)">
+                <button type="submit">Go</button>
+            </form>
         </div>
     </div>
-    <a href="#!">Finished</a>
+
 {% endblock %}
