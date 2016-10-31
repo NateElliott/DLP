@@ -14,28 +14,36 @@
                     <tbody>
                         {% for member in current_team  %}
                         <tr>
-                            <td><a href="/profile/{{ member.user.username }}">{{ member.user.first_name }} {{ member.user.last_name }}</a>
+                            <td>
+                                {% if member.user.first_name and member.user.last_name %}
+                                <a href="/profile/{{ member.user.username }}">{{ member.user.first_name }} {{ member.user.last_name }}</a>
+                                {% else %}
+                                <a href="/profile/{{ member.user.username }}">{{ member.user.email }}</a>
+                                {% endif %}
+
 
                             </td>
                             <td>{{ member.user.email }}</td>
-                            <td>Joined {{ member.user.date_joined }}</td>
+                            <td>Joined <abbr title="{{ member.user.date_joined }}">{{ member.user.date_joined|timesince }}</abbr> ago</td>
+                            <td>Last login was <abbr title="{{ member.user.last_login }}">{{ member.user.last_login|timesince }}</abbr> ago</td>
                             <td>
-                                <div>
-                            {% for stat in dasstats %}
-                            {% if stat.user_id == member.user.id %}
-                                {% if stat.status == "0" %}
-                                <div>
-                                    <span class="label label-primary">{{stat.module}}</span>
-                                    {% endif %}
-                                    <small>started {{stat.dtg}}</small>
-                                </div>
-                            {% endif %}
-                            {% endfor %}
+                                <span class="label label-success">4</span>
+                                <span class="label label-info">7</span>
+                                <span class="label label-warning">9</span>
                             </td>
                         </tr>
 
                         {% endfor %}
                     </tbody>
+                    <tr>
+                        <td colspan="5">
+                            <div class="pull-right">
+                            <span class="label label-success">Completed</span>
+                            <span class="label label-info">In progress</span>
+                            <span class="label label-warning">No data</span>
+                            </div>
+                        </td>
+                    </tr>
                 </table>
                 <hr>
             </div>

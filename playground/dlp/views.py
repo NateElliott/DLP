@@ -169,7 +169,7 @@ def manage(request):
         message = """
             # email/invite not working yet
             Good Day,
-            You've been invited to use the Daimlier Learning Platform
+            You've been invited to use the Daimler Learning Platform
 
             http://localhost:8000/register/%s
 
@@ -189,25 +189,23 @@ def manage(request):
     # superusers can see all teams.
     current_team = UserProfile.objects.filter(team=request.user)
 
-    module_all = Modules.objects.filter(published=True)
-    module_status = ModulesStatus.objects.all()
+    modules = Modules.objects.filter(published=True)
 
-    dasstats = []
-    for a in module_all:
-        if a.published:
-            for b in module_status:
-                if a.id == b.module_id:
-                    dasstats.append({"user_id":b.user_id,"status":b.status,"module":a,"dtg":b.dtg})
+    for member in current_team:
+
+
+        stats = ModulesStatus.objects.filter(user=member.user,status=100)
+        if stats:
+            print(member.user)
+
+
 
 
     return render(request, "manage.html", {"total_invites":total_invites,
                                            "pending_invites":pending_invites,
                                            "team_pending_invites":team_pending_invites,
                                            "team_all_invites":team_all_invites,
-                                           "current_team":current_team,
-                                           "module_status":module_status,
-                                           "dasstats":dasstats,
-                                           "modules":module_all})
+                                           "current_team":current_team,})
 
 
 
@@ -219,7 +217,6 @@ def module(request, storage=None):
         current_module = Modules.objects.get(storage=storage)
         if request.method == "POST" and int(request.POST["module_status"]) in range(0,101):
             if not ModulesStatus.objects.filter(user=request.user, module=current_module,status=100):
-
                 ModulesStatus(user=request.user,
                               module=current_module,
                               status=request.POST["module_status"]).save()
@@ -228,9 +225,8 @@ def module(request, storage=None):
             ModulesStatus(user=request.user,module=current_module,status=status).save()
 
         status = ModulesStatus.objects.filter(user=request.user, module=current_module).order_by("-dtg")[:1][0].status
-
         return render(request, "module.html", {"module": current_module,
-                                               "status": status})
+                                               "status": status,})
 
     else:
         info(request, "There was an error with your request")
@@ -244,16 +240,17 @@ def profile(request, username=None):
     if username and request.user.is_staff:
         if User.objects.filter(username=username):
             profile = User.objects.get(username=username)
+
             modules = Modules.objects.filter(published=True)
-            module_status = ModulesStatus.objects.filter(user=profile).order_by("dtg")
 
-
-
-
-            # append with this list
+            module_status = []
+            for mod in modules:
+                if ModulesStatus.objects.filter(user=profile, module=mod):
+                    module_status.append(ModulesStatus.objects.filter(user=profile, module=mod).order_by("-dtg")[:1][0])
 
             return render(request, "userprofile.html", {"profile": profile,
-                                                        "module_status":module_status,})
+                                                        "module_status":module_status,
+                                                        "modules":modules,})
 
         else:
             info(request, "There was an error with your request.")
@@ -262,7 +259,7 @@ def profile(request, username=None):
 
 
     if request.method == "POST":
-        current_user = User.objects.get(username=request.user.username)
+        current_user = User.objects.get(username=request.user)
         current_user.email = request.POST['email']
         current_user.first_name = request.POST['firstname']
         current_user.last_name = request.POST['lastname']
@@ -272,7 +269,8 @@ def profile(request, username=None):
         return redirect("/profile")
 
     else:
-        return render(request, "profile.html")
+        current_user_profile = UserProfile.objects.get(user=request.user)
+        return render(request, "profile.html",{"current_user_profile":current_user_profile,})
 
 
 @login_required

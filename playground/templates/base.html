@@ -27,14 +27,14 @@
                 <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
                 {% endif %}
                 {% if user.is_staff %}
-                <a href="{% url 'manage' %}">Team</a>
+                <a href="{% url 'manage' %}">Team</a>|
                 {% endif %}
-                <a href="{% url 'message' %}">Message Board</a>
-                <a href="{% url 'profile' %}">Profile</a>
-                <a href="{% url 'home' %}">Modules</a>
-                <a href="{% url 'logout' %}">Logout</a>
+                <a href="{% url 'message' %}">Message Board</a>|
+                <a href="{% url 'profile' %}">Profile</a>|
+                <a href="{% url 'home' %}">Modules</a>|
+                <a href="{% url 'logout' %}">Logout</a>|
             {% else %}
-                <a href="{% url 'login' %}">Login</a>
+                <a href="{% url 'login' %}">Login</a>|
             {% endif %}
         </header>
         {% if messages %}
