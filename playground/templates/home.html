@@ -66,12 +66,19 @@
                 {% if module.published %}
                     <tr>
                         <td><a href="{% url 'module' %}{{ module.storage }}">{{ module.name }}</a></td>
-                        <td>{{ module.description }}</td>
+                        <td>
                         {% for mod in pstats %}
                             {% if mod.module == module %}
-                                <td>{{ mod.status }} {{ mod.dtg }}</td>
+                                {% if mod.status == "0" %}
+                                    <div>Started <abbr title="{{mod.dtg}}">{{mod.dtg|timesince}}</abbr> ago</div>
+                                {% elif mod.status == "100" %}
+                                    <div>Finished <abbr title="{{mod.dtg}}">{{mod.dtg|timesince}}</abbr> ago</div>
+                                {% else %}
+                                    <div>Completed {{mod.status}}% <abbr title="{{mod.dtg}}">{{mod.dtg|timesince}}</abbr> ago</div>
+                                {% endif %}
                             {% endif %}
                         {% endfor %}
+                        </td>
                     </tr>
                 {% endif %}
             {% endfor %}

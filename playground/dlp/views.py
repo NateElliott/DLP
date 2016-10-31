@@ -180,7 +180,6 @@ def manage(request):
         info(request, message)
         return redirect("/manage")
 
-
     total_invites = InviteCode.objects.all()
     pending_invites = total_invites.filter(active=True)
     team_all_invites = total_invites.filter(leader=request.user)
@@ -188,17 +187,12 @@ def manage(request):
 
     # superusers can see all teams.
     current_team = UserProfile.objects.filter(team=request.user)
-
     modules = Modules.objects.filter(published=True)
+    member_stats = []
+
 
     for member in current_team:
-
-
-        stats = ModulesStatus.objects.filter(user=member.user,status=100)
-        if stats:
-            print(member.user)
-
-
+        pass
 
 
     return render(request, "manage.html", {"total_invites":total_invites,
@@ -206,7 +200,6 @@ def manage(request):
                                            "team_pending_invites":team_pending_invites,
                                            "team_all_invites":team_all_invites,
                                            "current_team":current_team,})
-
 
 
 @login_required
