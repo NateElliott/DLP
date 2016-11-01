@@ -187,13 +187,21 @@ def manage(request):
 
     # superusers can see all teams.
     current_team = UserProfile.objects.filter(team=request.user)
+
     modules = Modules.objects.filter(published=True)
-    member_stats = []
+    member_stats_complete = []
 
 
     for member in current_team:
-        pass
+        stats = ModulesStatus.objects.filter(user=member.user)
+        for stat in stats:
+            if int(stat.status) == 100:
+                member_stats_complete.append({"user":member.user,"module":stat.module})
+            elif int(stat.status) in range(0,99):
+                print(member)
 
+
+    print(member_stats_complete)
 
     return render(request, "manage.html", {"total_invites":total_invites,
                                            "pending_invites":pending_invites,
