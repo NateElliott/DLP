@@ -41,18 +41,13 @@
                 <div class="panel-body">
                     {% if payload %}
                         <div>
-                            <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-                            &nbsp;
-                            {{ payload.author.first_name }} {{ payload.author.last_name }}
-                                {% if payload.author.id == request.user.id %}
+                            {{ payload.author.first_name }} {{ payload.author.last_name }}<br>
+                            <small><abbr title="{{ payload.posted_dtg }}">{{ payload.posted_dtg|timesince }}</abbr> ago</small>
 
-                                <a href="#!" onclick="post('{% url 'message' %}',{action:'delete',item:'{{ payload.id }}'})">
-                                delete
-                                </a>
-                                {% endif %}
+                            {% if payload.author.id == request.user.id %}
+                            {% endif %}
                         </div>
                         <h3>{{ payload.title }}<br>
-                            <small>{{ payload.posted_dtg }}</small>
                         </h3>
                         <p>{{ payload.body|linebreaks }}</p>
                     <hr>
@@ -63,7 +58,7 @@
                             &nbsp;-&nbsp;
                             {{ reply.body }}
                             <span class="muted date-right">
-                                <small>{{ reply.posted_dtg }}</small>
+                                <small><abbr title="{{ reply.posted_dtg }}">{{ reply.posted_dtg|timesince }}</abbr></small>
                             </span>
                         </div>
                     {% endfor %}

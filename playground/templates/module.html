@@ -3,9 +3,10 @@
 {% block title %}Module{% endblock %}
 
 {% block content %}
-    <h2>{{ module.name }}</h2>
-    <h2><small>{{ module.description }}</small></h2>
+    <h2>{{ module.name }} <small>{{ module.description }}</small></h2>
+
     <div class="panel panel-default">
+        {{ module.storage }}
         <div class="panel-body">
             {{ status }}
             Learning!

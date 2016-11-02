@@ -85,12 +85,12 @@ def content_mgmt(request):
 
     if request.method == "POST":
         if request.POST["action"] == "delete":
-            Modules.objects.filter(name=request.POST["item"]).delete()
+            Modules.objects.filter(storage=request.POST["item"]).delete()
             info(request, "Module Deleted")
             return redirect("/home/")
 
         elif request.POST["action"] == "publish":
-            mod = Modules.objects.get(name=request.POST["item"])
+            mod = Modules.objects.get(storage=request.POST["item"])
 
             if mod.published:
                 mod.published = False
@@ -107,17 +107,17 @@ def content_mgmt(request):
         elif request.POST["action"] == "upload":
 
             if request.FILES["module"]:
-                uploadedfile = request.FILES["module"]
-                module_dir = "modules/"
-                ext = uploadedfile.name.split(".")
-                storage = generator.id_generator(size=16)
-                upload_dir = os.path.join(module_dir,storage,uploadedfile.name)
-                fs = FileSystemStorage()
-                fs.save(upload_dir, uploadedfile)
 
+                uploaded_file = request.FILES["module"]
+                module_dir = "modules"
+                ext = uploaded_file.name.split(".")
+                storage = generator.id_generator(size=16)
+                upload_dir = os.path.join(settings.MEDIA_ROOT,module_dir,storage,uploaded_file.name)
+                fs = FileSystemStorage()
+                fs.save(upload_dir, uploaded_file)
                 if ext[1:len(ext)][0] == "zip" and os.path.isfile(upload_dir):
                     zip_ref = zipfile.ZipFile(upload_dir,"r")
-                    zip_ref.extractall(os.path.join(settings.MEDIA_ROOT,module_dir,storage,'store'))
+                    zip_ref.extractall(os.path.join(settings.MEDIA_ROOT,module_dir,storage,"store"))
                     zip_ref.close()
 
                 if not request.POST['name']:
@@ -130,7 +130,7 @@ def content_mgmt(request):
                         description=request.POST['description'],
                         owner=request.user.username,
                         storage=storage,
-                        module=uploadedfile.name)
+                        module=uploaded_file.name).save()
 
                 info(request, "Module Uploaded")
                 return redirect("/home/")
@@ -189,19 +189,11 @@ def manage(request):
     current_team = UserProfile.objects.filter(team=request.user)
 
     modules = Modules.objects.filter(published=True)
-    member_stats_complete = []
 
-
+    stats = []
     for member in current_team:
-        stats = ModulesStatus.objects.filter(user=member.user)
-        for stat in stats:
-            if int(stat.status) == 100:
-                member_stats_complete.append({"user":member.user,"module":stat.module})
-            elif int(stat.status) in range(0,99):
-                print(member)
-
-
-    print(member_stats_complete)
+        for mod in modules:
+            a = ModulesStatus.objects.filter(user=member.user,module=mod).order_by("-dtg")[:1]
 
     return render(request, "manage.html", {"total_invites":total_invites,
                                            "pending_invites":pending_invites,
@@ -226,6 +218,11 @@ def module(request, storage=None):
             ModulesStatus(user=request.user,module=current_module,status=status).save()
 
         status = ModulesStatus.objects.filter(user=request.user, module=current_module).order_by("-dtg")[:1][0].status
+
+
+
+
+
         return render(request, "module.html", {"module": current_module,
                                                "status": status,})
 
