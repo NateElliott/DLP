@@ -128,7 +128,7 @@ def content_mgmt(request):
                         module=uploaded_file.name).save()
 
                 info(request, "Module Uploaded")
-                return redirect("/home/")
+                return redirect("/module/detail/"+storage)
 
     else:
         return redirect("/home/")
@@ -227,27 +227,45 @@ def module(request, storage=None):
 
 @login_required
 def module_detail(request, storage=None):
-    if Modules.objects.filter(storage=storage):
 
-        current_module = Modules.objects.get(storage=storage)
-
-        project_file = os.path.join(settings.MEDIA_ROOT,"modules",storage,"store")+"\project.txt"
-
-        print(project_file)
-
-        if os.path.isfile(project_file):
-            with open(project_file) as project_file_text:
-                project_data = json.load(project_file_text)
-
-
-        return render(request, "module-detail.html",{"module":current_module,"module_detail":project_data["metadata"]})
-
-
-
-
-    else:
-        info(request, "There was an error with your request")
+    if not request.user.is_superuser:
+        info(request,"There was an error with your request")
         return redirect("/home/")
+
+    if request.method == "POST":
+        if Modules.objects.filter(storage=storage):
+            current_module = Modules.objects.get(storage=storage)
+            current_module.name = request.POST["title"]
+            current_module.description = request.POST["description"]
+            current_module.reviewed = True
+            current_module.save()
+
+        info(request,"Module updated")
+        return redirect("/module/detail/" + request.POST["storage"])
+    else:
+        if Modules.objects.filter(storage=storage):
+            current_module = Modules.objects.get(storage=storage)
+            project_data = []
+            if not current_module.reviewed:
+                project_file = os.path.join(settings.MEDIA_ROOT,"modules",storage,"store")+"\project.txt"
+                if os.path.isfile(project_file):
+                    with open(project_file) as project_file_text:
+                        project_data_full = json.load(project_file_text)
+                        project_data = {"title":project_data_full["metadata"]["title"],
+                                        "description":project_data_full["metadata"]["description"],
+                                        "size":project_data_full["metadata"]["totalSlides"],
+                                        "load_file":project_data_full["metadata"]["launchFile"]}
+                else:
+                    project_data = {"title":current_module.name}
+            else:
+                project_data = {"title": current_module.name,
+                                "description":current_module.description}
+
+            return render(request, "module-detail.html",{"module":current_module,
+                                                         "module_detail":project_data})
+        else:
+            info(request, "There was an error with your request")
+            return redirect("/home/")
 
 
 

@@ -54,6 +54,9 @@ class Modules(models.Model):
     upload_dtg = models.DateTimeField(auto_now_add=True)
     published = models.BooleanField(default=False)
     storage = models.CharField(max_length=32)
+    size = models.CharField(max_length=16)
+    reviewed = models.BooleanField(default=False)
+    load_file = models.CharField(max_length=255)
 
 
     def __str__(self):
