@@ -16,8 +16,6 @@
                 <form method="POST" action="{% url 'content_mgmt' %}" enctype="multipart/form-data">
                     {% csrf_token %}
                     <input type="hidden" name="action" value="upload">
-                    <input id="id_name" maxlength="255" name="name" type="text" placeholder="Name" />
-                    <input id="id_description" maxlength="255" name="description" type="text" placeholder="Description" />
                     <input id="id_module" name="module" type="file" required />
                     <input type="submit">
                 </form>
@@ -28,7 +26,7 @@
             <table class="table">
                 {% for module in modules %}
                 <tr>
-                    <td>{{ module.name }}</td>
+                    <td><a href="/module/detail/{{ module.storage }}">{{ module.name }}</a></td>
                     <td><code>{{ module.storage }}</code></td>
                     <td>{{ module.description }}</td>
                     <td><abbr title="{{ module.upload_dtg }}">{{ module.upload_dtg|timesince }}</abbr></td>

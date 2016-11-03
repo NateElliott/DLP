@@ -16,6 +16,7 @@ urlpatterns = [
 
     url(r'manage/', views.manage, name='manage'),
 
+    url(r'module/detail/(?P<storage>[-\w]+)', views.module_detail, name='module'),
     url(r'module/(?P<storage>[-\w]+)', views.module, name='module'),
     url(r'module/', views.module, name='module'),
 

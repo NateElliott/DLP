@@ -1,4 +1,4 @@
-import os, zipfile
+import os, zipfile, json
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import UserForm, RegistrationForm, ModuleForm
 from .models import User, InviteCode, Modules, UserProfile, ModulesStatus, MessageBoard, Teams, MessageViews
 from .helpers import generator
+
 
 
 def index(request):
@@ -107,7 +108,7 @@ def content_mgmt(request):
         elif request.POST["action"] == "upload":
 
             if request.FILES["module"]:
-
+                # TODO: clean up path vars
                 uploaded_file = request.FILES["module"]
                 module_dir = "modules"
                 ext = uploaded_file.name.split(".")
@@ -120,14 +121,8 @@ def content_mgmt(request):
                     zip_ref.extractall(os.path.join(settings.MEDIA_ROOT,module_dir,storage,"store"))
                     zip_ref.close()
 
-                if not request.POST['name']:
-                    module_name = ext[0]
 
-                else:
-                    module_name = request.POST['name']
-
-                Modules(name=module_name,
-                        description=request.POST['description'],
+                Modules(name=ext[0],
                         owner=request.user.username,
                         storage=storage,
                         module=uploaded_file.name).save()
@@ -229,6 +224,32 @@ def module(request, storage=None):
     else:
         info(request, "There was an error with your request")
         return redirect("/home/")
+
+@login_required
+def module_detail(request, storage=None):
+    if Modules.objects.filter(storage=storage):
+
+        current_module = Modules.objects.get(storage=storage)
+
+        project_file = os.path.join(settings.MEDIA_ROOT,"modules",storage,"store")+"\project.txt"
+
+        print(project_file)
+
+        if os.path.isfile(project_file):
+            with open(project_file) as project_file_text:
+                project_data = json.load(project_file_text)
+
+
+        return render(request, "module-detail.html",{"module":current_module,"module_detail":project_data["metadata"]})
+
+
+
+
+    else:
+        info(request, "There was an error with your request")
+        return redirect("/home/")
+
+
 
 
 
