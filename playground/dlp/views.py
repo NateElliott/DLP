@@ -114,6 +114,8 @@ def content_mgmt(request):
                 ext = uploaded_file.name.split(".")
                 storage = generator.id_generator(size=16)
                 upload_dir = os.path.join(settings.MEDIA_ROOT,module_dir,storage,uploaded_file.name)
+
+
                 fs = FileSystemStorage()
                 fs.save(upload_dir, uploaded_file)
                 if ext[1:len(ext)][0] == "zip" and os.path.isfile(upload_dir):
@@ -232,6 +234,7 @@ def module_detail(request, storage=None):
         info(request,"There was an error with your request")
         return redirect("/home/")
 
+
     if request.method == "POST":
         if Modules.objects.filter(storage=storage):
             current_module = Modules.objects.get(storage=storage)
@@ -241,22 +244,35 @@ def module_detail(request, storage=None):
             current_module.save()
 
         info(request,"Module updated")
-        return redirect("/module/detail/" + request.POST["storage"])
+
+        return redirect("/home/")
+
     else:
         if Modules.objects.filter(storage=storage):
             current_module = Modules.objects.get(storage=storage)
             project_data = []
+
+
             if not current_module.reviewed:
+
                 project_file = os.path.join(settings.MEDIA_ROOT,"modules",storage,"store")+"\project.txt"
                 if os.path.isfile(project_file):
+
                     with open(project_file) as project_file_text:
                         project_data_full = json.load(project_file_text)
                         project_data = {"title":project_data_full["metadata"]["title"],
-                                        "description":project_data_full["metadata"]["description"],
-                                        "size":project_data_full["metadata"]["totalSlides"],
-                                        "load_file":project_data_full["metadata"]["launchFile"]}
+                                        "description":project_data_full["metadata"]["description"],}
+
+                    current_module.size = project_data_full["metadata"]["totalSlides"]
+                    current_module.load_file = project_data_full["metadata"]["launchFile"]
+                    current_module.save()
+
                 else:
                     project_data = {"title":current_module.name}
+                    current_module.size = 1
+                    current_module.load_file = current_module.module
+                    current_module.save()
+
             else:
                 project_data = {"title": current_module.name,
                                 "description":current_module.description}
@@ -264,7 +280,7 @@ def module_detail(request, storage=None):
             return render(request, "module-detail.html",{"module":current_module,
                                                          "module_detail":project_data})
         else:
-            info(request, "There was an error with your request")
+            info(request, "There was an error with your requesttt")
             return redirect("/home/")
 
 
