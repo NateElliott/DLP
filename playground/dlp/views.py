@@ -8,7 +8,7 @@ from django.contrib.messages import error, info
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
-from .forms import UserForm, RegistrationForm, ModuleForm
+from .forms import UserForm, RegistrationForm
 from .models import User, InviteCode, Modules, UserProfile, ModulesStatus, MessageBoard, Teams, MessageViews
 from .helpers import generator
 
