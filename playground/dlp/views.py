@@ -85,6 +85,7 @@ def userlogin(request):
 def content_mgmt(request):
 
     if request.method == "POST":
+
         if request.POST["action"] == "delete":
             Modules.objects.filter(storage=request.POST["item"]).delete()
             info(request, "Module Deleted")
@@ -92,17 +93,13 @@ def content_mgmt(request):
 
         elif request.POST["action"] == "publish":
             mod = Modules.objects.get(storage=request.POST["item"])
-
             if mod.published:
                 mod.published = False
                 info(request, "Module Unpublished")
-
             else:
                 mod.published = True
                 info(request, "Module Published")
-
             mod.save()
-
             return redirect("/home/")
 
         elif request.POST["action"] == "upload":
@@ -114,7 +111,6 @@ def content_mgmt(request):
                 ext = uploaded_file.name.split(".")
                 storage = generator.id_generator(size=16)
                 upload_dir = os.path.join(settings.MEDIA_ROOT,module_dir,storage,uploaded_file.name)
-
 
                 fs = FileSystemStorage()
                 fs.save(upload_dir, uploaded_file)
@@ -216,10 +212,6 @@ def module(request, storage=None):
 
         status = ModulesStatus.objects.filter(user=request.user, module=current_module).order_by("-dtg")[:1][0].status
 
-
-
-
-
         return render(request, "module.html", {"module": current_module,
                                                "status": status,})
 
@@ -252,7 +244,6 @@ def module_detail(request, storage=None):
             current_module = Modules.objects.get(storage=storage)
             project_data = []
 
-
             if not current_module.reviewed:
 
                 project_file = os.path.join(settings.MEDIA_ROOT,"modules",storage,"store")+"\project.txt"
@@ -282,9 +273,6 @@ def module_detail(request, storage=None):
         else:
             info(request, "There was an error with your requesttt")
             return redirect("/home/")
-
-
-
 
 
 @login_required
