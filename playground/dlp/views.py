@@ -1,4 +1,4 @@
-import os, zipfile
+import os, zipfile, json
 
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
@@ -8,9 +8,10 @@ from django.contrib.messages import error, info
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
-from .forms import UserForm, RegistrationForm, ModuleForm
+from .forms import UserForm, RegistrationForm
 from .models import User, InviteCode, Modules, UserProfile, ModulesStatus, MessageBoard, Teams, MessageViews
 from .helpers import generator
+
 
 
 def index(request):
@@ -84,56 +85,48 @@ def userlogin(request):
 def content_mgmt(request):
 
     if request.method == "POST":
+
         if request.POST["action"] == "delete":
-            Modules.objects.filter(name=request.POST["item"]).delete()
+            Modules.objects.filter(storage=request.POST["item"]).delete()
             info(request, "Module Deleted")
             return redirect("/home/")
 
         elif request.POST["action"] == "publish":
-            mod = Modules.objects.get(name=request.POST["item"])
-
+            mod = Modules.objects.get(storage=request.POST["item"])
             if mod.published:
                 mod.published = False
                 info(request, "Module Unpublished")
-
             else:
                 mod.published = True
                 info(request, "Module Published")
-
             mod.save()
-
             return redirect("/home/")
 
         elif request.POST["action"] == "upload":
 
             if request.FILES["module"]:
-                uploadedfile = request.FILES["module"]
-                module_dir = "modules/"
-                ext = uploadedfile.name.split(".")
+                # TODO: clean up path vars
+                uploaded_file = request.FILES["module"]
+                module_dir = "modules"
+                ext = uploaded_file.name.split(".")
                 storage = generator.id_generator(size=16)
-                upload_dir = os.path.join(module_dir,storage,uploadedfile.name)
-                fs = FileSystemStorage()
-                fs.save(upload_dir, uploadedfile)
+                upload_dir = os.path.join(settings.MEDIA_ROOT,module_dir,storage,uploaded_file.name)
 
+                fs = FileSystemStorage()
+                fs.save(upload_dir, uploaded_file)
                 if ext[1:len(ext)][0] == "zip" and os.path.isfile(upload_dir):
                     zip_ref = zipfile.ZipFile(upload_dir,"r")
-                    zip_ref.extractall(os.path.join(settings.MEDIA_ROOT,module_dir,storage,'store'))
+                    zip_ref.extractall(os.path.join(settings.MEDIA_ROOT,module_dir,storage,"store"))
                     zip_ref.close()
 
-                if not request.POST['name']:
-                    module_name = ext[0]
 
-                else:
-                    module_name = request.POST['name']
-
-                Modules(name=module_name,
-                        description=request.POST['description'],
+                Modules(name=ext[0],
                         owner=request.user.username,
                         storage=storage,
-                        module=uploadedfile.name)
+                        module=uploaded_file.name).save()
 
                 info(request, "Module Uploaded")
-                return redirect("/home/")
+                return redirect("/module/detail/"+storage)
 
     else:
         return redirect("/home/")
@@ -169,7 +162,7 @@ def manage(request):
         message = """
             # email/invite not working yet
             Good Day,
-            You've been invited to use the Daimlier Learning Platform
+            You've been invited to use the Daimler Learning Platform
 
             http://localhost:8000/register/%s
 
@@ -180,7 +173,6 @@ def manage(request):
         info(request, message)
         return redirect("/manage")
 
-
     total_invites = InviteCode.objects.all()
     pending_invites = total_invites.filter(active=True)
     team_all_invites = total_invites.filter(leader=request.user)
@@ -189,61 +181,137 @@ def manage(request):
     # superusers can see all teams.
     current_team = UserProfile.objects.filter(team=request.user)
 
-    module_all = Modules.objects.filter(published=True)
-    module_status = ModulesStatus.objects.all()
+    modules = Modules.objects.filter(published=True)
 
-    dasstats = []
-    for a in module_all:
-        if a.published:
-            for b in module_status:
-                if a.id == b.module_id:
-                    dasstats.append({"user_id":b.user_id,"status":b.status,"module":a,"dtg":b.dtg})
-
+    stats = []
+    for member in current_team:
+        for mod in modules:
+            a = ModulesStatus.objects.filter(user=member.user,module=mod).order_by("-dtg")[:1]
 
     return render(request, "manage.html", {"total_invites":total_invites,
                                            "pending_invites":pending_invites,
                                            "team_pending_invites":team_pending_invites,
                                            "team_all_invites":team_all_invites,
-                                           "current_team":current_team,
-                                           "module_status":module_status,
-                                           "dasstats":dasstats,
-                                           "modules":module_all})
-
-
+                                           "current_team":current_team,})
 
 
 @login_required
 def module(request, storage=None):
-
-    try:
+    status = 0
+    # TODO: this is a fucking mess
+    if Modules.objects.filter(storage=storage):
         current_module = Modules.objects.get(storage=storage)
+        if request.method == "POST" and int(request.POST["module_status"]) in range(0,101):
+            if not ModulesStatus.objects.filter(user=request.user, module=current_module,status=100):
+                ModulesStatus(user=request.user,
+                              module=current_module,
+                              status=request.POST["module_status"]).save()
+
         if not ModulesStatus.objects.filter(user=request.user,module=current_module):
-            ModulesStatus(user=request.user,
-                          module=current_module,
-                          status="started").save()
+            ModulesStatus(user=request.user,module=current_module,status=status).save()
 
-        return render(request, "module.html", {"module": current_module})
+        status = ModulesStatus.objects.filter(user=request.user, module=current_module).order_by("-dtg")[:1][0].status
 
-    except:
+        return render(request, "module.html", {"module": current_module,
+                                               "status": status,})
+
+    else:
         info(request, "There was an error with your request")
         return redirect("/home/")
 
+@login_required
+def module_detail(request, storage=None):
+
+    if not request.user.is_superuser:
+        info(request,"There was an error with your request")
+        return redirect("/home/")
+
+
+    if request.method == "POST":
+        if Modules.objects.filter(storage=storage):
+            current_module = Modules.objects.get(storage=storage)
+            current_module.name = request.POST["title"]
+            current_module.description = request.POST["description"]
+            current_module.reviewed = True
+            current_module.save()
+
+        info(request,"Module updated")
+
+        return redirect("/home/")
+
+    else:
+        if Modules.objects.filter(storage=storage):
+            current_module = Modules.objects.get(storage=storage)
+            project_data = []
+
+            if not current_module.reviewed:
+
+                project_file = os.path.join(settings.MEDIA_ROOT,"modules",storage,"store")+"\project.txt"
+                if os.path.isfile(project_file):
+
+                    with open(project_file) as project_file_text:
+                        project_data_full = json.load(project_file_text)
+                        project_data = {"title":project_data_full["metadata"]["title"],
+                                        "description":project_data_full["metadata"]["description"],}
+
+                    current_module.size = project_data_full["metadata"]["totalSlides"]
+                    current_module.load_file = project_data_full["metadata"]["launchFile"]
+                    current_module.save()
+
+                else:
+                    project_data = {"title":current_module.name}
+                    current_module.size = 1
+                    current_module.load_file = current_module.module
+                    current_module.save()
+
+            else:
+                project_data = {"title": current_module.name,
+                                "description":current_module.description}
+
+            return render(request, "module-detail.html",{"module":current_module,
+                                                         "module_detail":project_data})
+        else:
+            info(request, "There was an error with your requesttt")
+            return redirect("/home/")
 
 
 @login_required
-def profile(request):
+def profile(request, username=None):
+
+    if username and request.user.is_staff:
+        if User.objects.filter(username=username):
+            profile = User.objects.get(username=username)
+
+            modules = Modules.objects.filter(published=True)
+
+            module_status = []
+            for mod in modules:
+                if ModulesStatus.objects.filter(user=profile, module=mod):
+                    module_status.append(ModulesStatus.objects.filter(user=profile, module=mod).order_by("-dtg")[:1][0])
+
+            return render(request, "userprofile.html", {"profile": profile,
+                                                        "module_status":module_status,
+                                                        "modules":modules,})
+
+        else:
+            info(request, "There was an error with your request.")
+            return redirect("/manage")
+
+
 
     if request.method == "POST":
-        current_user = User.objects.get(username=request.user.username)
+        current_user = User.objects.get(username=request.user)
         current_user.email = request.POST['email']
         current_user.first_name = request.POST['firstname']
         current_user.last_name = request.POST['lastname']
         current_user.save()
+
         info(request, "Profile Updated")
-        return redirect('/profile')
+        return redirect("/profile")
 
     else:
-        return render(request, "profile.html")
+        current_user_profile = UserProfile.objects.get(user=request.user)
+        return render(request, "profile.html",{"current_user_profile":current_user_profile,})
 
 
 @login_required

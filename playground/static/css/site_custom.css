@@ -4,11 +4,19 @@
     color: #FFF;
     font-size: 0.75em;
 }
+
 .date-right {
     float:right
   }
 
-
 .message-reply {
     padding: 3px;
+}
+
+.page-header {
+    padding: 5px;
+}
+
+.page-menu {
+    padding: 5px;
 }

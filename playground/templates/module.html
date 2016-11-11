@@ -3,12 +3,21 @@
 {% block title %}Module{% endblock %}
 
 {% block content %}
-    <h2>{{ module.name }}</h2>
-    <h2><small>{{ module.description }}</small></h2>
+    <h2>{{ module.name }} <small>{{ module.description }}</small></h2>
+<iframe src="http://localhost:8000/media/modules/{{ module.storage }}/store/{{ module.load_file }}" style="border:0;" width="960" height="480"></iframe>
+
     <div class="panel panel-default">
         <div class="panel-body">
-            Learning!
+            <hr>
+
+
+            <hr>
+            <form method="post">
+                {% csrf_token %}
+                <input type="number" name="module_status" placeholder="Set module status (0-100)">
+                <button type="submit">Go</button>
+            </form>
         </div>
     </div>
-    <a href="#!">Finished</a>
+
 {% endblock %}

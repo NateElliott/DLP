@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile{% endblock %}
+
+{% block content %}
+
+    <h2>{{profile.first_name}} {{profile.last_name}}</h2>
+    <div>
+        <div>Joined <abbr title="{{ profile.date_joined }}">{{ profile.date_joined|timesince }}</abbr> ago</div>
+        <div>Last login was <abbr title="{{ profile.last_login }}">{{ profile.last_login|timesince }}</abbr> ago</div>
+
+
+
+
+
+    </div>
+
+
+    <div class="container">
+
+    {% for module in modules %}
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <strong>{{ module }}</strong>
+            </div>
+            <div class="panel-body">
+                {% for current in module_status %}
+                    {% if current.module == module %}
+                        <div class="container">
+                            <div class="col-md-2">
+                                {{ current.module }}
+                            </div>
+                            <div class="col-md-4">
+                        <div class="progress">
+                            <div class="progress-bar" role="progressbar" aria-valuenow="{{ current.status }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ current.status }}%;">
+                                {{ current.status }}%
+                            </div>
+                        </div>
+
+                            </div>
+                            <div class="col-md-6">
+                                Updated: <abbr title="{{ current.dtg }}">{{ current.dtg|timesince }} ago</abbr>
+                            </div>
+                        </div>
+
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+
+    </div>
+
+
+
+
+<!--
+
+
+
+
+<table class="table">
+        {% for module in module_status %}
+            {% if module.status == "0" %}
+            <tr>
+                <td>{{ module.module }}</td>
+                <td><small>Started {{ module.dtg|timesince }} ago</small></td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+    </table>
+-->
+
+
+{% endblock %}
