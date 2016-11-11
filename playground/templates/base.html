@@ -20,8 +20,6 @@
                 <img src="{% static 'img/img-logo-daimler-svg.svg' %}"
             </div>
             <div>
-            <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
-            &nbsp;
             {% if user.is_authenticated %}
                 {% if user.is_superuser %}
                 <span class="glyphicon glyphicon-star" aria-hidden="true"></span>
@@ -32,9 +30,7 @@
                 <a href="{% url 'message' %}">Message Board</a> |
                 <a href="{% url 'profile' %}">Profile</a> |
                 <a href="{% url 'home' %}">Modules</a> |
-                <a href="{% url 'logout' %}">Logout</a> |
-            {% else %}
-                <a href="{% url 'login' %}">Login</a> |
+                <a href="{% url 'logout' %}">Logout</a>
             {% endif %}
                 </div>
         </header>

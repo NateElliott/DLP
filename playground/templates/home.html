@@ -11,24 +11,6 @@
             <b>Superuser</b>
         </div>
         <div class="panel-body">
-            <div>
-                <h4><strong>Upload Content</strong></h4>
-                <form method="POST" action="{% url 'content_mgmt' %}" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    <input type="hidden" name="action" value="upload">
-
-                    <div class="row">
-                        <div class="col-md-4">
-                            <input id="id_module" name="module" type="file" required />
-                        </div>
-                        <div class="col-md-4">
-                            <button type="submit" class="btn btn-primary">Upload</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <hr>
-
             <h4><strong>Current Content</strong></h4>
             <table class="table">
                 {% for module in modules %}
@@ -60,6 +42,30 @@
                 {% endfor %}
             </table>
 
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel panel-heading">
+            <strong>Upload new content</strong>
+        </div>
+        <div class="panel panel-body">
+            <form method="post" action="{% url 'content_mgmt' %}" enctype="multipart/form-data" class="form-inline">
+                <fieldset>
+                    <legend>Upload</legend>
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="upload">
+                    <div class="form-group">
+                        <label for="id_module">Choose File </label>
+                        <input id="id_module" name="module" type="file" style="display:none;">
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-xs">Upload</button>
+                    </div>
+                </fieldset>
+
+            </form>
         </div>
     </div>
     {% endif %}
