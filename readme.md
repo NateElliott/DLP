@@ -30,6 +30,14 @@ Install Django framework
 
     sudo pip install Django
 
+Clone dev branc of DLP repo
+
+    sudo git clone -b dev https://github.com/NateElliott/DLP.git
+
+Start local instance of DLP
+
+    python /home/DLP/playground/manage.py runserver 0.0.0.0:8000
+
 
 
 
