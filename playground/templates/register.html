@@ -5,19 +5,47 @@
 
 
 {% block content %}
-<h2>Register</h2>
-<form method="post" action="{% url 'register' %}">
-    {% csrf_token %}
-    <input type="hidden" name="invite" value="{{ invite }}">
-    {{ form.as_p }}
 
-    <p><textarea placeholder="TOS"></textarea></p>
-    <p>
-        <input id="agree_tos" type="checkbox">
-        <label for="agree_tos">I agree to TOS</label>
-    </p>
-    <p><button type="submit">Register</button></p>
+<div class="container">
+    <div class="col-md-4 col-md-offset-3">
+        <form class="form-horizontal" method="post" action="{% url 'register' %}">
+            {% csrf_token %}
+            <fieldset>
+                <legend>Register</legend>
 
-</form>
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="username"><strong>Username</strong></label>
+                    <div class="col-md-8">
+                        <input id="username" name="username" type="text" placeholder="username" class="form-control input-md" required="">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="password"><strong>Password</strong></label>
+                    <div class="col-md-8">
+                        <input id="password" name="password" type="password" placeholder="password" class="form-control input-md" required="">
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div class="col-sm-offset-2 col-sm-10">
+                        <div class="checkbox">
+                            <label>
+                            <input type="checkbox"> I agree to the <a href="#!">Terms of Service</a> and <a href="#!">Privacy Policy</a>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="col-md-4 col-md-offset-4">
+                        <button class="btn btn-default">Register</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</div>
 
 {% endblock %}
