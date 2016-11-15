@@ -11,6 +11,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
 from .forms import UserForm
+from django.contrib.auth.models import User
 from .models import User, InviteCode, Modules, UserProfile, ModulesStatus, MessageBoard, Teams, MessageViews
 from .helpers import generator
 
