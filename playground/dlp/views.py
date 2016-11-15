@@ -1,5 +1,7 @@
 import os, zipfile, json
 
+from django.http import HttpResponse
+
 from django.conf import settings
 from django.core.files.storage import FileSystemStorage
 from django.contrib.auth import login, logout, authenticate
@@ -8,7 +10,7 @@ from django.contrib.messages import error, info
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 
-from .forms import UserForm, RegistrationForm
+from .forms import UserForm
 from .models import User, InviteCode, Modules, UserProfile, ModulesStatus, MessageBoard, Teams, MessageViews
 from .helpers import generator
 
@@ -24,10 +26,13 @@ def index(request):
 
 
 def register(request, invite="0000"):
-    if request.method == "POST":
-        current_invite = InviteCode.objects.get(invite_code=request.POST['invite'])
 
-        if current_invite.active:
+    # POST REQUEST
+    if request.method == "POST":
+
+        current_invite = InviteCode.objects.filter(invite_code=request.POST['invite'])[0]
+
+        if current_invite and current_invite.active:
             new_user = User.objects.create_user(request.POST['username'],current_invite.email,request.POST['password'])
             new_profile = UserProfile(user=new_user,
                                       invite_code=request.POST['invite'],
@@ -49,27 +54,34 @@ def register(request, invite="0000"):
             info(request,"You have been registered, please login")
             return redirect("/login/")
         else:
+            info(request,"There was an error with your request")
             return redirect("/")
+
+    # GET REQUEST
     else:
+
         if request.user.is_authenticated():
             return redirect("/home/")
+
         else:
-            return render(request, "register.html",{'form': RegistrationForm(),'invite':invite})
+            invite = InviteCode.objects.filter(invite_code=invite)
+            if invite:
+                return render(request, "register.html", {'invite': invite[0]})
+            else:
+                info(request, "There was an error with your request.")
+                return redirect("/")
+
 
 
 def userlogin(request):
     if request.method == "POST":
         user = authenticate(username=request.POST['username'],
                             password=request.POST['password'])
-        if user is not None:
-            if user.is_active:
-                login(request, user)
-                info(request, "Welcome back")
-                return redirect("/home/")
+        if user and user.is_active:
 
-            else:
-                info(request, "User is not active")
-                return redirect("/login/")
+            login(request, user)
+            info(request, "Welcome back")
+            return redirect("/home/")
 
         else:
             error(request, "There was an error with your username/password")

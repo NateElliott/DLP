@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 
 
@@ -5,13 +6,14 @@
 
 
 {% block content %}
-
+{% load static %}
 <div class="container">
     <div class="col-md-6 col-md-offset-3">
         <form class="form-horizontal" method="post" action="{% url 'register' %}">
+             <input type="hidden" name="invite" value="{{ invite }}">
             {% csrf_token %}
             <fieldset>
-                <legend>Register</legend>
+                <legend>Register <small>({{ invite.email }})</small></legend>
 
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="username"><strong>Username</strong></label>
@@ -38,7 +40,7 @@
                     <div class="col-sm-offset-2 col-sm-10">
                         <div class="checkbox">
                             <label>
-                            <input type="checkbox"> I agree to the <a href="#!">Terms of Service</a> and <a href="#!">Privacy Policy</a>
+                            <input type="checkbox"> I agree to the <a target="_blank" href="{% static 'text/tos.txt' %}">Terms of Service</a> and <a target="_blank" href="{% static 'text/pp.txt' %}">Privacy Policy</a>
                             </label>
                         </div>
                     </div>
