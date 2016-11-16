@@ -14,13 +14,16 @@
         <link rel="stylesheet" href="{% static 'css/site_custom.css' %}">
     </head>
     <body>
-        <div class="container">
-        <headerstyle="background-image: url({% static 'img/brushed.jpg' %})">
-            <div class="page-header">
-                <p class="text-center">
+
+        <div style="background-image: url({% static 'img/brushed.jpg' %});padding-bottom:15px">
+
+                <p class="text-center" style="padding-top: 15px">
                     <img src="{% static 'img/img-logo-daimler-svg.svg' %}">
                 </p>
-            </div>
+
+        </div>
+
+        <div class="container">
             <div>
             {% if user.is_authenticated %}
                 {% if user.is_superuser %}
@@ -35,7 +38,7 @@
                 <a href="{% url 'logout' %}">Logout</a>
             {% endif %}
                 </div>
-        </header>
+
         {% if messages %}
         <div class="container">
             <div class="alert alert-info" role="alert">

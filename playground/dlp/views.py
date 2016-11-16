@@ -24,8 +24,7 @@ def index(request):
         return redirect("/home/")
 
     else:
-        form = UserForm()
-        return render(request,"login.html",{'LoginForm':form})
+        return render(request,"login.html")
 
 
 def register(request, invite="0000"):
@@ -333,7 +332,7 @@ def updatepassword(request):
 
     if request.method == "POST":
         user = User.objects.get(username=request.user.username)
-        if request.POST["newpassword"] == request.POST["confirmpassword"]:
+        if request.POST["newpassword"] == request.POST["confirmpassword"] and user.check_password(request.POST["currentpassword"]):
 
             user.set_password(request.POST["confirmpassword"])
             user.save()
