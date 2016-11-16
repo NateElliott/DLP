@@ -23,6 +23,16 @@ class SiteData(models.Model):
     def __str__(self):
         return self.name
 
+class ResetPassword(models.Model):
+    code = models.CharField(max_length=128, unique=True)
+    datetime = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(default=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.code
+
+
 
 class InviteCode(models.Model):
     invite_code = models.CharField(max_length=128,unique=True)

@@ -8,6 +8,9 @@ urlpatterns = [
 
     url(r'login/', views.userlogin, name='login'),
     url(r'logout/', views.userlogout, name='logout'),
+    url(r'forgotpassword', views.forgotpassword, name='forgotpassword'),
+    url(r'resetpassword/(?P<reset>[-\w]+)', views.resetpassword, name='resetpassword'),
+    url(r'resetpassword/', views.resetpassword, name='resetpassword'),
 
     url(r'register/(?P<invite>[-\w]+)', views.register, name='register'),
     url(r'register/', views.register, name='register'),
@@ -23,6 +26,7 @@ urlpatterns = [
     url(r'message/(?P<message_id>[-\w]+)', views.message, name='message'),
     url(r'message/', views.message, name='message'),
 
+    url(r'profile/updatepassword', views.updatepassword, name='updatepassword'),
     url(r'profile/(?P<username>[-\w]+)', views.profile, name='profile'),
     url(r'profile/', views.profile, name='profile'),
 

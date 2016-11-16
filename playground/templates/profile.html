@@ -7,7 +7,7 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="col-md-8 col-md-offset-2">
-            <form method="POST" action="{% url 'profile' %}" class="form-horizontal">
+            <form method="post" action="{% url 'profile' %}" class="form-horizontal">
                 {% csrf_token %}
                 <fieldset>
                     <legend>Update Profile ({{ request.user.username  }})</legend>
@@ -39,31 +39,31 @@
                     </div>
                 </fieldset>
             </form>
-            <form class="form-horizontal">
+            <form method="post" action="/profile/updatepassword/" class="form-horizontal">
+                {% csrf_token %}
                 <fieldset>
                     <legend>Change Password</legend>
+                    <strong>You will be logged  to login after changing your password</strong><hr>
 
                     <div class="form-group">
-                        <label for="email" class="col-sm-2 control-label">Current Password</label>
+                        <label for="newpassword" class="col-sm-2 control-label">New Password</label>
                         <div class="col-sm-10">
-                            <input type="email" name="email" class="form-control" id="email" placeholder="Email"">
+                            <input type="password" name="newpassword" class="form-control" id="newpassword" placeholder="new password">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="email" class="col-sm-2 control-label">New Password</label>
+                        <label for="confirmpassword" class="col-sm-2 control-label">Confirm Password</label>
                         <div class="col-sm-10">
-                            <input type="email" name="email" class="form-control" id="email" placeholder="Email"">
+                            <input type="password" name="confirmpassword" class="form-control" id="confirmpassword" placeholder="confirm password">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="email" class="col-sm-2 control-label">Confirm Password</label>
-                        <div class="col-sm-10">
-                            <input type="email" name="email" class="form-control" id="email" placeholder="Email">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button type="submit" class="btn btn-primary">Change</button>
                         </div>
                     </div>
-
 
 
                 </fieldset>

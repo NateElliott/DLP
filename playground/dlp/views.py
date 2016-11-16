@@ -13,6 +13,8 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import UserForm
 from django.contrib.auth.models import User
 from .models import User, InviteCode, Modules, UserProfile, ModulesStatus, MessageBoard, Teams, MessageViews
+from .models import ResetPassword
+
 from .helpers import generator
 
 
@@ -325,6 +327,80 @@ def profile(request, username=None):
     else:
         current_user_profile = UserProfile.objects.get(user=request.user)
         return render(request, "profile.html",{"current_user_profile":current_user_profile,})
+
+@login_required
+def updatepassword(request):
+
+    if request.method == "POST":
+        user = User.objects.get(username=request.user.username)
+        if request.POST["newpassword"] == request.POST["confirmpassword"]:
+
+            user.set_password(request.POST["confirmpassword"])
+            user.save()
+            info(request, "Account password has been updated")
+            return redirect("/profile/")
+        else:
+            info(request, "There was an error with your request")
+            return redirect("/profile/")
+
+def forgotpassword(request):
+    if request.method == "POST":
+
+        user = User.objects.filter(email=request.POST["email"])[0]
+
+        if user is not None and user.is_active:
+            code = generator.id_generator(size=32)
+            temp_pass = generator.id_generator(size=64)
+            ResetPassword(code=code,user=user).save()
+            user.set_password(temp_pass)
+            user.save()
+            info(request, "Please check your email ("+code+")")
+            return redirect("/")
+
+        else:
+            info(request, "There is no record of that email in our system")
+            return redirect("/")
+
+    else:
+        return render(request, "forgotpassword.html")
+
+
+def resetpassword(request, reset="0000"):
+    if request.method == "POST":
+
+
+
+
+        re = ResetPassword.objects.filter(code=request.POST["code"])[0]
+
+        if re is not None and re.active:
+            if request.POST["newpassword"] == request.POST["confirmpassword"]:
+                re.active = False
+                re.user.set_password(request.POST["confirmpassword"])
+                re.user.save()
+                re.save()
+
+            info(request, "Your password has been reset, please login")
+            return redirect("/")
+        else:
+            info(request, "There was a problem with your request")
+            return redirect("/")
+
+    else:
+
+        re = ResetPassword.objects.filter(code=reset)[0]
+
+        if re is not None and re.active:
+            return render(request, "resetpassword.html",{"reset":re})
+        else:
+            info(request, "There was a problem with your request")
+            return redirect("/")
+
+
+
+
+
+
 
 
 @login_required
