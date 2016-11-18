@@ -13,7 +13,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .forms import UserForm
 from django.contrib.auth.models import User
 from .models import User, InviteCode, Modules, UserProfile, ModulesStatus, MessageBoard, Teams, MessageViews
-from .models import ResetPassword
+from .models import ResetPassword, UserLog
 
 from .helpers import generator
 
@@ -82,6 +82,7 @@ def userlogin(request):
         if user and user.is_active:
 
             login(request, user)
+            UserLog(user=request.user,action="login",ip= request.META['REMOTE_ADDR']).save()
             info(request, "Welcome back")
             return redirect("/home/")
 
@@ -207,6 +208,38 @@ def manage(request):
                                            "team_pending_invites":team_pending_invites,
                                            "team_all_invites":team_all_invites,
                                            "current_team":current_team,})
+
+
+@login_required
+def manageteam(request):
+    current_team = UserProfile.objects.filter(team=request.user)
+    return render(request, "manage.html", {"current_team":current_team})
+
+
+def manageinvites(request):
+
+    total_invites = InviteCode.objects.all()
+    pending_invites = total_invites.filter(active=True)
+
+    return render(request, "manage.html",{"total_invites":total_invites,
+                                          "pending_invites":pending_invites,
+                                          "page":"invites",
+                                          "title":"Manage/Invites"})
+
+
+def manageusers(request):
+    users = User.objects.all()
+    return render(request, "manage.html", {"users":users,
+                                           "page": 'users',
+                                           "title":"Manage/Users"})
+
+def managemodules(request):
+    modules = Modules.objects.all()
+    return render(request, "manage.html", {"modules": modules,
+                                           "page": 'modules',
+                                           "title": "Manage/Modules"})
+
+
 
 
 @login_required
@@ -405,6 +438,7 @@ def resetpassword(request, reset="0000"):
 @login_required
 def userlogout(request):
 
+    UserLog(user=request.user, action="logout", ip=request.META['REMOTE_ADDR']).save()
     logout(request)
     return redirect("/home/")
 

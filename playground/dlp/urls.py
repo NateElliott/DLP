@@ -17,7 +17,10 @@ urlpatterns = [
 
     url(r'cms/', views.content_mgmt, name='content_mgmt'),
 
-    url(r'manage/', views.manage, name='manage'),
+    url(r'manage/users', views.manageusers, name='manage'),
+    url(r'manage/team', views.manageteam, name='manage'),
+    url(r'manage/modules', views.managemodules, name='manage'),
+    url(r'manage/invites', views.manageinvites, name='manage'),
 
     url(r'module/detail/(?P<storage>[-\w]+)', views.module_detail, name='module'),
     url(r'module/(?P<storage>[-\w]+)', views.module, name='module'),

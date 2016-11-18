@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Team{% endblock %}
+
+{% block content %}
+    <hr>
+
+    <div class="panel panel-default">
+        <div class="container">
+            <div class="col-md-2" style="padding-top: 20px;">
+                <div class="list-group" style="width: 100%">
+                    <a href="/manage/team/" class="list-group-item">Current Users</a>
+                    <a href="/manage/modules/" class="list-group-item">Modules</a>
+                    <a href="/manage/invites" class="list-group-item">Invites</a>
+                </div>
+
+            </div>
+            <div class="col-md-10">
+                <table class="table">
+                    <tbody>
+                        {% for member in current_team  %}
+                        <tr>
+                            <td>
+                                {% if member.user.first_name and member.user.last_name %}
+                                <a href="/profile/{{ member.user.username }}">{{ member.user.first_name }} {{ member.user.last_name }}</a>
+                                {% else %}
+                                <a href="/profile/{{ member.user.username }}">{{ member.user.email }}</a>
+                                {% endif %}
+
+
+                            </td>
+                            <td>{{ member.user.email }}</td>
+                            <td>Joined <abbr title="{{ member.user.date_joined }}">{{ member.user.date_joined|timesince }}</abbr> ago</td>
+                            <td>Last login was <abbr title="{{ member.user.last_login }}">{{ member.user.last_login|timesince }}</abbr> ago</td>
+                            <td>
+                                <span class="label label-success">4</span>
+                                <span class="label label-info">7</span>
+                                <span class="label label-warning">9</span>
+                            </td>
+                        </tr>
+
+                        {% endfor %}
+                    </tbody>
+                    <tr>
+                        <td colspan="5">
+                            <div class="pull-right">
+                            <span class="label label-success">Completed</span>
+                            <span class="label label-info">In progress</span>
+                            <span class="label label-warning">No data</span>
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+
+
+
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+             <hr>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div>
+                    <form class="form-inline" method="POST" action="{% url 'manage' %}">
+                        {% csrf_token %}
+                        Invite others:
+                        <input type="email" name="email" class="form-control" placeholder="Email">
+                        {% if user.is_superuser %}
+                        <input type="checkbox" name="staff" id="is_staff">
+                        <label for="is_staff">Staff</label>
+                        {% endif %}
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    </form>
+                </div>
+                <table class="table">
+                    {% if team_pending_invites %}
+                    <caption>Pending Invites</caption>
+                    <tbody>
+                        {% for invite in team_pending_invites %}
+                        <tr>
+                            <td>{{ invite.email }}</td>
+                            <td><code>{{ invite.invite_code }}</code></td>
+                            <td>Sent {{ invite.sent }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% else %}
+                    <caption>No pending invites</caption>
+                    {% endif %}
+                </table>
+
+            </div>
+    </div>
+
+
+    {% if user.is_superuser %}
+    <div class="panel panel-default">
+        <div class="panel panel-heading">
+            <b>Superuser</b>
+        </div>
+        <div class="panel-body">
+            Site-wide, <b>{{ total_invites|length }}</b> invites have been sent.<br>
+            We are still waiting on <b>{{ pending_invites|length  }}</b> to register.
+        </div>
+    </div>
+    {% endif %}
+{% endblock %}

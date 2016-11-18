@@ -43,7 +43,7 @@
                 {% csrf_token %}
                 <fieldset>
                     <legend>Change Password</legend>
-                    <strong>You will be logged  to login after changing your password</strong><hr>
+                    <strong>You will be required to login after changing your password</strong><hr>
 
                     <div class="form-group">
                         <label class="col-md-2 control-label" for="currentpassword">Current Password</label>
@@ -75,11 +75,6 @@
 
                 </fieldset>
             </form>
-
-                    {{ current_user_profile.location_city }}
-                    {{ current_user_profile.location_country }}
-                    {{ current_user_profile.location_state }}
-
         </div>
     </div>
 </div>

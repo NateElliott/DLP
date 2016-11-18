@@ -33,12 +33,17 @@ class ResetPassword(models.Model):
         return self.code
 
 
+class UserLog(models.Model):
+    user = models.ForeignKey(User)
+    action = models.CharField(max_length=128)
+    ip = models.CharField(max_length=15)
+    datetime = models.DateTimeField(auto_now_add=True)
 
 class InviteCode(models.Model):
     invite_code = models.CharField(max_length=128,unique=True)
     staff = models.BooleanField(default=False)
     active = models.BooleanField(default=True)
-    leader = models.CharField(max_length=128)
+    sent_by = models.ForeignKey(User)
     email = models.CharField(max_length=128)
     sent = models.DateTimeField(auto_now_add=True)
 
@@ -48,7 +53,7 @@ class InviteCode(models.Model):
         self.invite_code = generator.id_generator(size=16)
         self.staff = staff
         self.email = email
-        self.leader = leader
+        self.sent_by = leader
         self.save()
         return self.invite_code
 

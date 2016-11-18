@@ -1,0 +1,36 @@
+<hr>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <table class="table">
+            <caption>Current Content</caption>
+            {% for module in modules %}
+            <tr>
+                <td><a href="/module/detail/{{ module.storage }}">{{ module.name }}</a></td>
+                <td>{{ module.description }}</td>
+                <td><abbr title="{{ module.upload_dtg }}">{{ module.upload_dtg|timesince }}</abbr></td>
+
+                {% if module.published %}
+                    <td>
+                        <a href="#!" onclick="post('{% url 'content_mgmt' %}',{action:'publish',item:'{{ module.storage }}'})">
+                        Published</a>
+                    </td>
+                    <td><span class="glyphicon glyphicon-ok" aria-hidden="true"></span></td>
+                {% else %}
+                    <td>
+                    <a href="#!" onclick="post('{% url 'content_mgmt' %}',{action:'publish',item:'{{ module.storage }}'})">
+                        Not Published
+                    </a>
+                    </td>
+                    <td>
+                    <a href="#!" onclick="post('{% url 'content_mgmt' %}',{action:'delete',item:'{{ module.storage }}'})">
+                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                    </a>
+                </td>
+                {% endif %}
+
+            </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+</div>
