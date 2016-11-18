@@ -227,11 +227,26 @@ def manageinvites(request):
                                           "title":"Manage/Invites"})
 
 
-def manageusers(request):
-    users = User.objects.all()
-    return render(request, "manage.html", {"users":users,
-                                           "page": 'users',
-                                           "title":"Manage/Users"})
+def manageusers(request,user=None):
+
+    if user:
+        current_user = User.objects.filter(username=user)
+        user_log = UserLog.objects.filter(user=current_user).order_by("-datetime")
+        if current_user:
+            return render(request, "manage.html", {"current_user": current_user[0],
+                                                   "logs":user_log,
+                                                   "page":"user",
+                                                   "title":"Manage/User"})
+
+        else:
+            info(request,"There was an error with your request")
+            return redirect("/manage/users/")
+    else:
+        users = User.objects.all()
+        return render(request, "manage.html", {"users": users,
+                                               "page": "users",
+                                               "title": "Manage/Users"})
+
 
 def managemodules(request):
     modules = Modules.objects.all()

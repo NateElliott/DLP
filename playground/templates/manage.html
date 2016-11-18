@@ -19,7 +19,7 @@
             </div>
 
         </div>
-        <div class="col-md-10">
+        <div class="col-md-9">
             {% if page == 'modules' %}
             {% include '_managemodules.html' %}
             {% endif %}
@@ -30,6 +30,10 @@
 
             {% if page == 'users' %}
             {% include '_manageusers.html' %}
+            {% endif %}
+
+            {% if page == 'user' %}
+            {% include '_manageuser.html' %}
             {% endif %}
 
             {% if page == 'invites' %}

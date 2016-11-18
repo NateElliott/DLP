@@ -1,0 +1,44 @@
+<hr>
+<div class="panel panel-default">
+    <div class="panel-body">
+
+        <h4>
+            {% if current_user.first_name and current_user.last_name %}
+            <a href="/profile/{{ current_user.username }}">{{ current_user.first_name }} {{ current_user.last_name }}</a>
+            {% else %}
+            <a href="/profile/{{ current_user.username }}">{{ current_user.email }}</a>
+            {% endif %}
+        </h4>
+        <div class="muted">
+            <div>{{current_user.email}}</div>
+            <div>Joined {{current_user.date_joined}}</div>
+        </div>
+        <br>
+        {% if not logs %}
+        <p class="muted">No records to display</p>
+        {% else %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Activity</td>
+                    <td>Date/Time</td>
+                    <td>IP</td>
+                </tr>
+            </thead>
+
+
+            <tbody>
+                {% for log in logs  %}
+                <tr>
+                    <td>{{ log.action }}</td>
+                    <td>{{ log.datetime }}</td>
+                    <td>{{ log.ip }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+
+
+    </div>
+</div>

@@ -1,8 +1,8 @@
 <hr>
 <div class="panel panel-default">
     <div class="panel-body">
+        <h4>Current Content</h4>
         <table class="table">
-            <caption>Current Content</caption>
             {% for module in modules %}
             <tr>
                 <td><a href="/module/detail/{{ module.storage }}">{{ module.name }}</a></td>

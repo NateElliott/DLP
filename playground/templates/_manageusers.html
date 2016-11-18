@@ -1,1 +1,25 @@
-{{ users }}
+<hr>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <h4>Current Users</h4>
+        <table class="table">
+            <tbody>
+                {% for user in users  %}
+                <tr>
+                    <td>
+                        {% if user.first_name and user.last_name %}
+                        <a href="/profile/{{ user.username }}">{{ user.first_name }} {{ user.last_name }}</a>
+                        {% else %}
+                        <a href="/profile/{{ user.username }}">{{ user.email }}</a>
+                        {% endif %}
+                    </td>
+                    <td>{{ user.email }}</td>
+                    <td>Joined <abbr title="{{ user.date_joined }}">{{ user.date_joined|timesince }}</abbr> ago</td>
+                    <td><a href="/manage/users/{{user}}">Activity</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
