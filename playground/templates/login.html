@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-
+{%  load static    %}
 {% block title %}Login{% endblock %}
 
 {% block content %}
@@ -15,9 +15,17 @@
           <h4 class="modal-title"><center>Please Select Your Language</center></h4>
         </div>
         <div class="modal-body">
-          <center><button type="button_english">English</button>
-  <br>
-  <center><button type="button_japanese">Japanese</button>
+	<img{display: block;}>
+	
+	<center>
+	<button type = "button" class="btn btn-default" data-dismiss="modal"> <img src="{%static '\img\brit.jpg'%}" height="92" width="192" ></button>
+
+	<!--<img src="{%static 'img\line.png'%}"  height= "92" width ="16">-->
+
+	<button type = "button" class="btn btn-default" data-dismiss="modal"> <img src="{%static '\img\japanese.jpg'%}" height="92" width="192" > </button>
+	</center>
+
+
         <!--</div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
