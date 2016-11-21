@@ -1,13 +1,13 @@
 <hr>
 <div class="panel panel-default">
     <div class="panel-body">
-        <h4>Current Content</h4>
+    <h4>Current Content</h4>
         <table class="table">
             {% for module in modules %}
             <tr>
-                <td><a href="/module/detail/{{ module.storage }}">{{ module.name }}</a></td>
+                <td>{{ module.name }}</td>
                 <td>{{ module.description }}</td>
-                <td><abbr title="{{ module.upload_dtg }}">{{ module.upload_dtg|timesince }}</abbr></td>
+                <td>{{ module.upload_dtg }}</td>
 
                 {% if module.published %}
                     <td>
@@ -34,3 +34,23 @@
 
     </div>
 </div>
+   <div class="panel panel-default">
+        <div class="panel panel-body">
+            <form method="post" action="{% url 'content_mgmt' %}" enctype="multipart/form-data" class="form-inline">
+                <fieldset>
+                    <legend>Upload</legend>
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="upload">
+                    <div class="form-group">
+                        <label for="id_module">Choose File </label>
+                        <input id="id_module" name="module" type="file" style="display:none;">
+                    </div>
+
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary btn-xs">Upload</button>
+                    </div>
+                </fieldset>
+
+            </form>
+        </div>
+    </div>

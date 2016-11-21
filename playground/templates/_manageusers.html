@@ -2,21 +2,65 @@
 
 <div class="panel panel-default">
     <div class="panel-body">
-        <h4>Current Users</h4>
+        <h4>
+            Current Users&nbsp;|&nbsp;
+            <div class="dropdown" style="display:inline">
+                <button class="btn btn-primary btn-xs dropdown-toggle" type="button" id="sort_menu" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    Sort:
+                    {% if sort == 'last_name' %}
+                        Last Name <em>a-z</em>
+                    {% endif %}
+                    {% if sort == '-last_name' %}
+                        Last Name <em>z-a</em>
+                    {% endif %}
+                    {% if sort == 'date_joined' %}
+                        Join Date
+                    {% endif %}
+                    {% if sort == 'last_login' %}
+                        Last Login
+                    {% endif %}
+                    <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="sort_menu">
+                    <li><a href="?sort=last_name">Last Name <em>a-z</em></a></li>
+                    <li><a href="?sort=-last_name">Last Name <em>z-a</em></a></li>
+                    <li><a href="?sort=date_joined">Join Date</a></li>
+                    <li><a href="?sort=last_login">Last Login</a></li>
+                </ul>
+            </div>
+        </h4>
         <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Join Date</th>
+                    <th></th>
+                </tr>
+            </thead>
             <tbody>
-                {% for user in users  %}
+                {% for user in users_complete  %}
                 <tr>
                     <td>
                         {% if user.first_name and user.last_name %}
                         <a href="/profile/{{ user.username }}">{{ user.first_name }} {{ user.last_name }}</a>
                         {% else %}
-                        <a href="/profile/{{ user.username }}">{{ user.email }}</a>
+                        <a href="/profile/{{ user.username }}"><small class="text-muted">Profile incomplete</small></a>
                         {% endif %}
                     </td>
                     <td>{{ user.email }}</td>
-                    <td>Joined <abbr title="{{ user.date_joined }}">{{ user.date_joined|timesince }}</abbr> ago</td>
-                    <td><a href="/manage/users/{{user}}">Activity</a></td>
+                    <td>{{ user.date_joined }}</td>
+                    <td><small><a href="/manage/users/{{user}}">Activity</a></small><br>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% for user in users_incomplete  %}
+                <tr>
+                    <td><small class="text-muted">Profile incomplete</small</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.date_joined }}</td>
+                    <td><small><a href="/manage/users/{{user}}">Activity</a></small><br>
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>

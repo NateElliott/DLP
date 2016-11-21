@@ -1,4 +1,5 @@
 import os, zipfile, json
+from operator import itemgetter
 
 from django.http import HttpResponse
 
@@ -9,6 +10,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.messages import error, info
 from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
+
+from django.core import mail
 
 from .forms import UserForm
 from django.contrib.auth.models import User
@@ -83,6 +86,7 @@ def userlogin(request):
 
             login(request, user)
             UserLog(user=request.user,action="login",ip= request.META['REMOTE_ADDR']).save()
+
             info(request, "Welcome back")
             return redirect("/home/")
 
@@ -242,9 +246,35 @@ def manageusers(request,user=None):
             info(request,"There was an error with your request")
             return redirect("/manage/users/")
     else:
-        users = User.objects.all()
-        return render(request, "manage.html", {"users": users,
+
+        sort_options = ["last_name","date_joined","last_login"]
+        sort_type = "last_name"
+
+        if request.GET.get("sort"):
+            sort_by = request.GET.get("sort")
+
+            if sort_by[0] == "-":
+                sort_type = sort_by[1:len(sort_by)]
+            else:
+                sort_type = sort_by
+
+            if sort_type in sort_options:
+                sort_type = request.GET.get("sort")
+
+        users = User.objects.all().order_by(sort_type)
+
+        users_complete = []
+        users_incomplete = []
+        for user in users:
+            if user.first_name and user.last_name:
+                users_complete.append(user)
+            else:
+                users_incomplete.append(user)
+
+        return render(request, "manage.html", {"users_complete": users_complete,
+                                               "users_incomplete":users_incomplete,
                                                "page": "users",
+                                               "sort": sort_type,
                                                "title": "Manage/Users"})
 
 
@@ -401,6 +431,7 @@ def forgotpassword(request):
             ResetPassword(code=code,user=user).save()
             user.set_password(temp_pass)
             user.save()
+
             info(request, "Please check your email ("+code+")")
             return redirect("/")
 
@@ -414,9 +445,6 @@ def forgotpassword(request):
 
 def resetpassword(request, reset="0000"):
     if request.method == "POST":
-
-
-
 
         re = ResetPassword.objects.filter(code=request.POST["code"])[0]
 
@@ -442,10 +470,6 @@ def resetpassword(request, reset="0000"):
         else:
             info(request, "There was a problem with your request")
             return redirect("/")
-
-
-
-
 
 
 
