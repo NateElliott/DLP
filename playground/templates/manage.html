@@ -24,6 +24,10 @@
             {% include '_managemodules.html' %}
             {% endif %}
 
+            {% if page == 'module' %}
+            {% include '_managemodule.html' %}
+            {% endif %}
+
             {% if page == 'teams' %}
             {% include '_manageteams.html' %}
             {% endif %}

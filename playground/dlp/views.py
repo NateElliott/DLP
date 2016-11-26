@@ -205,13 +205,13 @@ def manage(request):
     stats = []
     for member in current_team:
         for mod in modules:
-            a = ModulesStatus.objects.filter(user=member.user,module=mod).order_by("-dtg")[:1]
+            a = ModulesStatus.objects.filter(user=member.user, module=mod).order_by("-dtg")[:1]
 
-    return render(request, "manage.html", {"total_invites":total_invites,
-                                           "pending_invites":pending_invites,
-                                           "team_pending_invites":team_pending_invites,
-                                           "team_all_invites":team_all_invites,
-                                           "current_team":current_team,})
+    return render(request, "manage.html", {"total_invites": total_invites,
+                                           "pending_invites": pending_invites,
+                                           "team_pending_invites": team_pending_invites,
+                                           "team_all_invites": team_all_invites,
+                                           "current_team": current_team,})
 
 
 @login_required
@@ -225,29 +225,29 @@ def manageinvites(request):
     total_invites = InviteCode.objects.all()
     pending_invites = total_invites.filter(active=True)
 
-    return render(request, "manage.html",{"total_invites":total_invites,
-                                          "pending_invites":pending_invites,
-                                          "page":"invites",
-                                          "title":"Manage/Invites"})
+    return render(request, "manage.html",{"total_invites": total_invites,
+                                          "pending_invites": pending_invites,
+                                          "page": "invites",
+                                          "title": "Manage/Invites"})
 
 
-def manageusers(request,user=None):
+def manageusers(request, user=None):
 
     if user:
         current_user = User.objects.filter(username=user)
         user_log = UserLog.objects.filter(user=current_user).order_by("-datetime")
         if current_user:
             return render(request, "manage.html", {"current_user": current_user[0],
-                                                   "logs":user_log,
-                                                   "page":"user",
-                                                   "title":"Manage/User"})
+                                                   "logs": user_log,
+                                                   "page": "user",
+                                                   "title": "Manage/User"})
 
         else:
-            info(request,"There was an error with your request")
+            info(request, "There was an error with your request")
             return redirect("/manage/users/")
     else:
 
-        sort_options = ["last_name","date_joined","last_login"]
+        sort_options = ["last_name", "date_joined", "last_login"]
         sort_type = "last_name"
 
         if request.GET.get("sort"):
@@ -272,18 +272,22 @@ def manageusers(request,user=None):
                 users_incomplete.append(user)
 
         return render(request, "manage.html", {"users_complete": users_complete,
-                                               "users_incomplete":users_incomplete,
+                                               "users_incomplete": users_incomplete,
                                                "page": "users",
                                                "sort": sort_type,
                                                "title": "Manage/Users"})
 
 
-def managemodules(request):
-    modules = Modules.objects.all()
-    return render(request, "manage.html", {"modules": modules,
-                                           "page": 'modules',
-                                           "title": "Manage/Modules"})
+def managemodules(request, storage=None):
 
+    if storage:
+        pass
+    else:
+
+        modules = Modules.objects.all()
+        return render(request, "manage.html", {"modules": modules,
+                                               "page": 'modules',
+                                               "title": "Manage/Modules"})
 
 
 
@@ -327,8 +331,7 @@ def module_detail(request, storage=None):
             current_module.reviewed = True
             current_module.save()
 
-        info(request,"Module updated")
-
+        info(request, "Module updated")
         return redirect("/home/")
 
     else:
@@ -404,6 +407,7 @@ def profile(request, username=None):
     else:
         current_user_profile = UserProfile.objects.get(user=request.user)
         return render(request, "profile.html",{"current_user_profile":current_user_profile,})
+
 
 @login_required
 def updatepassword(request):
@@ -481,52 +485,5 @@ def userlogout(request):
     logout(request)
     return redirect("/home/")
 
-
-@login_required
-def message(request, message_id=None):
-
-    myprofile = UserProfile.objects.get(user=request.user)
-    board = MessageBoard.objects.filter(team=myprofile.team, parent=0).order_by("-id")
-    board_views = MessageViews.objects.filter(user=request.user)
-
-    if request.method == "POST":
-
-        try:
-
-            MessageBoard(body=request.POST["body"],
-                         author=request.user,
-                         parent=request.POST["parent"],
-                         team=myprofile.team).save()
-
-            info(request,"beta message")
-            return redirect("/message/" + request.POST["parent"])
-        except:
-            MessageBoard(title=request.POST["title"],
-                         body=request.POST["body"],
-                         author=request.user,
-                         parent=0,
-                         team=myprofile.team).save()
-            info(request, "Message Posted")
-            return redirect("/message/")
-
-
-    if message_id:
-        try:
-            payload = MessageBoard.objects.get(id=message_id)
-            payload_reply = MessageBoard.objects.filter(parent=message_id)
-            if not MessageViews.objects.filter(message=payload, user=request.user, data="view"):
-                MessageViews(message=payload, user=request.user, data="view").save()
-        except:
-            info(request, "There was a problem with your request")
-            return redirect("/message/")
-
-    else:
-        payload=None
-        payload_reply=None
-
-    return render(request, "message.html", {"board":board,
-                                            "views":board_views,
-                                            "payload":payload,
-                                            "payload_reply":payload_reply})
 
 
